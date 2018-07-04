@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <form action="/files">
+  path:<br>
+  <input type="text" name="path" value="path">
+  <br>
+  username:<br>
+  <input type="text" name="username" value="username">
+  <br>
+  Password:<br>
+  <input type="text" name="password" value="password">
+  <br><br>
+  <input type="submit" value="Submit" onClick="goToInfo()">
+</form> 
+<script>
+function goToInfo(){
+	window.location = "files.jsp";
+	 }
+</script>
+</body>
+</html>
