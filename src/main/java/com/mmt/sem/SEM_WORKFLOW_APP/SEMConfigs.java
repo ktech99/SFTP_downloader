@@ -15,8 +15,6 @@ public class SEMConfigs {
         return new JSch();
     }
         
-    
-    
     @Bean
     public Download download(){
     	return new Download("/","demo","password");
