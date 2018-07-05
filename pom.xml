@@ -23,9 +23,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 	</properties>
-	
-	
-
+	  
 	<dependencies>
 	
 	<!-- https://mvnrepository.com/artifact/com.jcraft/jsch -->
@@ -41,7 +39,7 @@
 	<dependency>
     	<groupId>commons-net</groupId>
     	<artifactId>commons-net</artifactId>
-    	<version>3.3</version>
+    	<version>3.6</version>
 	</dependency>
 
 		<dependency>
@@ -65,11 +63,21 @@
         </dependency>
         
         <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-core -->
-<dependency>
-    <groupId>org.apache.hadoop</groupId>
-    <artifactId>hadoop-core</artifactId>
-    <version>0.20.2</version>
-</dependency>
+
+
+		<dependency>
+    		<groupId>org.apache.hadoop</groupId>
+    		<artifactId>hadoop-client</artifactId>
+    		<version>2.6.0</version>
+		</dependency>
+
+		<dependency>
+    		<groupId>org.apache.hadoop</groupId>
+   			<artifactId>hadoop-hdfs</artifactId>
+    		<version>2.6.0</version>
+		</dependency>
+
+
 
 		
         
@@ -93,7 +101,7 @@
         <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
-                <source>1.</source>
+                <source>1.8</source>
                 <target>1.8</target>
             </configuration>
         </plugin>

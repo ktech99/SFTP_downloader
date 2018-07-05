@@ -76,6 +76,7 @@ public class Download {
 		byte[] buffer = new byte[1024];
 		BufferedInputStream bis;
 		connect();
+		
 		try {
 			System.out.println("Files in directory:");
 			for (int i = 0; i < Filelist.size(); i++) {
@@ -94,6 +95,7 @@ public class Download {
 						}else{
 						System.out.println("File already exists.");
 						}
+					
 					OutputStream os = new FileOutputStream(newFile);
 					BufferedOutputStream bos = new BufferedOutputStream(os);
 					int readCount;
