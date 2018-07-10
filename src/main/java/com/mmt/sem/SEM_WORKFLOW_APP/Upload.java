@@ -1,107 +1,62 @@
+/*
+* Method to upload Zip files in FTPUnzipped folder to hdfs server
+* */
 package com.mmt.sem.SEM_WORKFLOW_APP;
 
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 
 import org.apache.hadoop.conf.Configuration;
 
 import org.apache.hadoop.fs.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@Service
+@Controller
 public class Upload {
 
-	public Upload() {
 
-	}
-
-//	public void startUpload() throws IOException {
-//
-//		FileSystem hdfs = FileSystem.get(new Configuration());
-//
-//		// Print the home directory
-//
-//		System.out.println("Home folder -" + hdfs.getHomeDirectory());
-//
-//		// Create & Delete Directories
-//		
-//
-//		Path workingDir = hdfs.getWorkingDirectory();
-//		//
-//		Path newFolderPath = new Path("/MyDataFolder");
-//		//
-//	
-//		System.out.println("1");
-//
-//		if (hdfs.exists(newFolderPath))
-//		{
-//
-//			// Delete existing Directory
-//
-//			hdfs.delete(newFolderPath, true);
-//
-//			System.out.println("Existing Folder Deleted.");
-//
-//		}
-//
-//		hdfs.mkdirs(newFolderPath); // Create new Directory
-//		//
-//		// System.out.println("Folder Created.");
-//
-//		// Copying File from local to HDFS
-//		System.out.println("2");
-//
-//		String home = System.getProperty("user.home");
-//
-//		Path localFilePath = new Path(home + "/Downloads/FTP2/color.epf");
-//		System.out.println("4");
-//
-//		Path hdfsFilePath = new Path(hdfs.getWorkingDirectory() + "/dataFile1.epf");
-//		System.out.println(localFilePath);
-//
-//		hdfs.copyFromLocalFile(localFilePath, hdfsFilePath);
-//
-//		System.out.println("File copied from local to HDFS.");
-//
-//	}
-
-	public void startUpload2() throws IOException {
-		// TODO code application logic here
-		// InetSocketAddress add = new InetSocketAddress("192.168.20.12", 9000);
-		// //-------> Use this if you are using DistributedFileSystem Class(For
-		// hadoop configured as distributed)
-		try {
-			URI url = new URI("hdfs://0.0.0.0:19000"); // -------> (url where
-															// hdfs located-for
-															// detail look
-															// hadoop
-															// configuration
-															// )Use this if you
-															// are using
-															// FileSystem
-															// Class(For hadoop
-															// configured on a
-															// single system)
+    @RequestMapping("upload")
+    @ResponseBody
+    public BaseResponse startUpload() throws IOException {
+    return startUpload("hdfs://0.0.0.0:19000","TEMP_UNZIPPED\\");
+    }
+        public BaseResponse startUpload(String hdfs_url, String unzip_dir) throws IOException {
+		// TODO write method for distributed system
+            BaseResponse response = new BaseResponse();
+            response.setFunction("Upload");
+            try {
+			//Use this for hdfs configured on a single node
+			URI url = new URI(hdfs_url);
 			Configuration conf = new Configuration();
-			// DistributedFileSystem ffs = new DistributedFileSystem(add, conf);
 			FileSystem file1 = FileSystem.get(url, conf);
-			System.out.print(file1.getWorkingDirectory());
+			System.out.println(file1.getWorkingDirectory());
 			String home = System.getProperty("user.home");
-			File folder = new File(home + "/Downloads/FTP2/");
+			URL destPath = ResourceUtils.getURL("classpath:"+ unzip_dir);
+			File folder = new File(String.valueOf(Paths.get(destPath.toURI()).toFile()));
 			File[] listOfFiles = folder.listFiles();
+			File dir = new File(String.valueOf(Paths.get(destPath.toURI()).toFile()));
 			for (int i = 0; i < listOfFiles.length; i++) {
 				if (listOfFiles[i].isFile() && listOfFiles[i].getName().endsWith(".csv")) {
-					System.out.println("File " + listOfFiles[i].getName());
-					Path src = new Path(home + "/Downloads/FTP2/" + listOfFiles[i].getName());
+				    response.addFileName(listOfFiles[i].getName());
+					System.out.println("uploading File: " + listOfFiles[i].getName());
+					Path src = new Path(String.valueOf(Paths.get(destPath.toURI()).toFile()) +"\\" + listOfFiles[i].getName());
 					Path dst = new Path(file1.getWorkingDirectory()+"/" + listOfFiles[i].getName());
-					System.out.println(dst);
-					// fs.copyFromLocalFile(b1, b2, src, dst);
 					file1.copyFromLocalFile(src, dst);
+					System.out.println("upload success");
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+                response.setStatus(400);
+                response.setMessage(e.toString());
+			    e.printStackTrace();
 		}
+		return response;
 	}
 }

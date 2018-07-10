@@ -17,7 +17,7 @@ public class SEMConfigs {
         
     @Bean
     public Download download(){
-    	return new Download("/","demo","password");
+    	return new Download();
     }
     
   
