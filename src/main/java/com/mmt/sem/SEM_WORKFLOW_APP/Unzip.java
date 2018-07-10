@@ -1,9 +1,11 @@
 /*Class to unzip folders that we just downloaded from the SFTP server*/
 package com.mmt.sem.SEM_WORKFLOW_APP;
 
+import ch.qos.logback.core.util.COWArrayList;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
@@ -11,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -20,18 +23,14 @@ public class Unzip {
     private String zipFilePath;
     private String destDir;
 
-    public Unzip() {
-        System.out.print("Unzipping");
-        String home = System.getProperty("user.home");
-    }
 
     @RequestMapping("unzip")
     @ResponseBody
-    public BaseResponse unzipping() {
-       return unzipping("TEMP_ZIP\\", "TEMP_UNZIPPED\\");
-    }
-        public BaseResponse unzipping(String zipDir, String unzipDir) {
-        BaseResponse response = new BaseResponse();
+    public BaseResponse unzipping(BaseResponse response)
+    {
+        String zipDir = response.getZipDir();
+        String unzipDir = response.getUnZipDir();
+        ArrayList<String> fileArray= response.getFileName();
         response.setFunction("Unzip");
         System.out.print("Unzipping");
         try {
@@ -49,13 +48,11 @@ public class Unzip {
             URL filePath = ResourceUtils.getURL("classpath:"+ zipDir);
             File folder = new File(String.valueOf(Paths.get(filePath.toURI()).toFile()));
 
-            //File folder = new File(zipFilePath);
             try {
                 File[] listOfFiles = folder.listFiles();
                 for (int i = 0; i < listOfFiles.length; i++) {
-                    if (listOfFiles[i].isFile() && listOfFiles[i].getName().endsWith(".zip")) {
+                    if (listOfFiles[i].isFile() && listOfFiles[i].getName().endsWith(".zip") && fileArray.contains(listOfFiles[i].getName())) {
                         System.out.println("File " + listOfFiles[i].getName());
-                        response.addFileName(listOfFiles[i].getName());
                         fis = new FileInputStream(String.valueOf(Paths.get(filePath.toURI()).toFile()) + "\\"+listOfFiles[i].getName());
                         ZipInputStream zis = new ZipInputStream(fis);
                         ZipEntry ze = zis.getNextEntry();
@@ -71,6 +68,9 @@ public class Unzip {
                                 } else {
                                     System.out.println("File already exists.");
                                 }
+                                //TODO
+                                response.removeFiles(fileName);
+                                response.addFileName(newFile.getName());
                                 new File(newFile.getAbsolutePath()).mkdirs();
                                 FileOutputStream fos = new FileOutputStream(newFile);
                                 int len;
@@ -96,6 +96,6 @@ public class Unzip {
             response.setMessage(a.toString());
             a.printStackTrace();
         }
-    return response;
+        return response;
     }
 }
